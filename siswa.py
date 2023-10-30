@@ -7,7 +7,6 @@ conn = st.experimental_connection('mysql', type='sql' )
 ta= conn.query(F"select thn_ajaran as ta FROM thn_ajaran order by ta desc")
 unit= conn.query(F"select nama_unit  FROM unit_pendidikan ")
 
-
 def data_siswa():
     st.write("# Data Siswa")
 
@@ -19,10 +18,7 @@ def data_siswa():
     sub_kat = st.sidebar.selectbox ("sub kategori",sub_kategori.keys())
     sub_kategori[sub_kat]()
 
-
 def data_umum():
-    
-    
     tab1,tab2,tab3 = st.tabs(['pencarian','historis','alamat'])
     with tab1:
         st.header('Pencarian  siswa')
@@ -36,52 +32,48 @@ def data_umum():
         st.header('alamat siswa per kelurahan')
         alamat()
 
-
 def identitas_siswa():
-
     pilih_ta = st.selectbox('tahun ajaran', (ta))
 
     add_radio = st.radio(
             "cari siswa berdasarkan ",
             ("nama siswa", "NIS", "nama orang tua"),horizontal=True
         )
-    cari = st.text_input('input nama')
-    nama_siswa = conn.query(F"call cari_siswa(  '{cari}','{pilih_ta}') ") 
-    
-    ayah_ibu = conn.query(F"call cari_ortu( '{cari}','{pilih_ta}')  " )
-    NIS  = conn.query(F"call NIS('{cari}','{pilih_ta}') ") 
     
     if add_radio == "nama siswa":
-        df = nama_siswa
+        cari_siswa = st.text_input('input nama',max_chars=40)
+        nama_siswa = conn.query(F"call cari_siswa(  '{cari_siswa}','{pilih_ta}') ")
+        df = pd.DataFrame(nama_siswa)
+
     elif add_radio == "NIS":
-        df=NIS
+        cari_NIS = st.text_input('input nama',max_chars=10)
+        NIS  = conn.query(F"call NIS('{cari_NIS}','{pilih_ta}') ") 
+        df = pd.DataFrame(NIS)
+        
     else:
+        cari_ortu = st.text_input('input nama',max_chars=40)
+        ayah_ibu = conn.query(F"call cari_ortu( '{cari_ortu}','{pilih_ta}')  " )
         df = ayah_ibu
 
     df.index +=1
     df.index.rename('No', inplace=True)
-     
- 
     st.write(df)
 
-def siswa_ta():
-    
+def siswa_ta():  
     st.text("tahun ajaran")
-    cari = st.text_input('input NIS')
+    cari = st.text_input('input NIS',max_chars=10)
     NIS  = conn.query(F"call nis_ta('{cari}') ") 
     df = pd.DataFrame(NIS)
-    
-    st.text('Nama siswa : '+df['Nama siswa'][0] )
     
     df.index +=1
     df.index.rename('No',inplace=True)
     st.write(df[['tahun ajaran','kelas']])
-
+    nama = df['Nama siswa'].drop_duplicates()
+    st.text('nama siswa: ' + nama.values)
 
 def alamat():
     st.text("Alamat")
-    pilih_ta = st.selectbox('pilih tahun ajaran', (ta))
-    
+    pilih_ta = st.selectbox('pilih tahun ajaran', (ta))    
     Col1, Col2 = st.columns(2)
     with Col1:
         kab_kota = conn.query(F"SELECT DISTINCT `Kab./Kota` from siswa WHERE `Kab./Kota` != ''  ")
@@ -94,14 +86,11 @@ def alamat():
     df =pd.DataFrame(kelurahan_mana)
     df.index +=1
     df.index.rename('No', inplace=True)
-
     st.write(df)
-
 
 def statistiK_siswa():
     import streamlit as st
-    st.text("statistik siswa")
-    
+    st.text("statistik siswa")    
     tab1, tab2, tab3,tab4 = st.tabs(["per kelas", "per jenjang kelas", "jumlah kumulatif", "siswa pindah"])
 
     with tab1:
@@ -116,14 +105,11 @@ def statistiK_siswa():
         st.header("jumlah kumulatif")
         siswa_per_unit()
 
-
     with tab4:
         st.header("siswa pindah keluar")
         siswa_pindah()
 
-
 def siswa_per_kelas():
-
     col1,col2 =st.columns(2)
     with col1:
         pilih_ta = st.selectbox( 'tahun ajaran',(ta))
@@ -140,7 +126,6 @@ def siswa_per_kelas():
     st.text('jumlah siswa: '+ str( len(df)))
     #jumlah row
 
-
     csv = convert_df(cari_kelas)
     st.download_button(
     label="download",
@@ -149,11 +134,8 @@ def siswa_per_kelas():
     mime="text/csv"
     )   
 
-def jenjang_siswa():
-    
+def jenjang_siswa():    
     pilih_ta = st.selectbox( 'tahun ',(ta))
-
-    
     col1,col2 = st.columns(2)
     with col1:
         pilih_unit =st.selectbox('unit',(unit))
@@ -180,7 +162,6 @@ def jenjang_siswa():
     )   
 
 def siswa_per_unit():
-    
     pilih_ta = st.selectbox('pilih tahun ajaran', (ta))
     jmlh  = conn.query(F"call jml_siswa('{pilih_ta}') ") 
     df = pd.DataFrame(jmlh)
@@ -188,31 +169,20 @@ def siswa_per_unit():
     # df.loc['total'] = pd.Series(df.sum(numeric_only=True) )
     st.dataframe(df,hide_index=True)
     
-    
-    
-
-
-
     jmlh_perkelas  = conn.query(F"call siswa_unit_kelas('{pilih_ta}') ")
     jmlh_perkelas.index +=1
     jmlh_perkelas.index.rename('No', inplace=True)
     df = pd.DataFrame(jmlh_perkelas)
     st.write(df)
         
-
-
-
 def siswa_pindah():
-        
     pindah  = conn.query(F"select * from v_siswa_pindah") 
     pindah.index +=1
     pindah.index.rename('No', inplace=True)
     st.write(pindah)
 
-
 def data_keluarga():
     st.text("data keluarga siswa")
-
     tab1,tab2 = st.tabs(['Siswa bersaudara', 'identitas orang tua'])
     with tab1:
         saudara()        
