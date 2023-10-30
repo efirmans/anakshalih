@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import csv
 
-
 conn = st.experimental_connection('mysql', type='sql' )
 ta = conn.query(F"select thn_ajaran as ta FROM thn_ajaran order by ta desc ")
 unit= conn.query(F"select nama_unit  FROM unit_pendidikan ")
@@ -26,7 +25,6 @@ def biaya_pendidikan():
     sub_kategori[sub_kat]()
     
 def histori():
-
     st.text('histori pembayaran')
     col1,col2 = st.columns(2)
     with col1:
@@ -37,7 +35,7 @@ def histori():
         queri.loc[len(queri)] = tambahan
         kategori = st.selectbox('kategori tagihan',  (queri))
 
-    cari = st.text_input('input nis')
+    cari = st.text_input('input nis',max_chars=10)
     nama_siswa = conn.query(F"select `nama_lengkap` as '' from siswa where `NIS SDIT` = '{cari}' or `NIS TKIT` = '{cari}' limit 1")
     df=nama_siswa
     ubah = df.values.tolist()
@@ -49,9 +47,6 @@ def histori():
         df =conn.query (F"call nama_by_tagih_non_kategori ('{cari}','{pilih_ta}')")
     else:
         df =conn.query (F"call nama_by_tagih ('{cari}','{pilih_ta}','{kategori}')")
-
-
-
     df.index +=1
     df.index.rename('No', inplace=True)
     st.write(df)
@@ -88,9 +83,6 @@ def tunggakan():
     ubah = df.values.tolist()
     satu = str(ubah).replace("[['","") 
     st.text('jumlah tunggakan '+ str(satu).replace("']]",""))
-
-
-    
     tab1, tab2, tab3, tab4 = st.tabs(["berdasar jenis tagihan", 
                                 "berdasar nama siswa", 
                                 "berdasar unit",
@@ -106,8 +98,7 @@ def tunggakan():
         df= pd.DataFrame(tagihan)
         pilih = df.query(F"kategori == '{kategori}' ")
         pilih_tag = st.selectbox('nama tagihan',pilih['nama tagihan'].drop_duplicates())
-        
-        
+                
         hasilnya = df.query(F" `nama tagihan`  == '{pilih_tag}' ")
         hasilnya.reset_index(inplace=True)
         hasilnya.index +=1
@@ -131,9 +122,7 @@ def tunggakan():
         data= csv,
         file_name="per nama tagihan.csv",
         mime="text/csv"
-        
         )   
-        
         
         # kumulatif jenis tagihan
 
@@ -147,8 +136,6 @@ def tunggakan():
         file_name="kumulatif per nama tagihan.csv",
         mime="text/csv"
         )
-
-
 
     # berdasar nama siswa
    
@@ -193,7 +180,6 @@ def tunggakan():
             mime="text/csv"
             ) 
 
-
     with tab3:
         st.header("berdasar unit")
         
@@ -208,14 +194,23 @@ def tunggakan():
             kat_tag = st.selectbox('kategori tagihan',  (queri))
         with col2:
             tag = conn.query(F"select distinct tag_singkat from  tag_kat where kategori = '{kat_tag}'  and nama_unit = '{kat_unit}' and thn_ajaran ='{pilih_ta}' ")
-            nama_tag = st.selectbox('nama tagihan',(tag))
+            tambahan = "Semua SPP"
+            tag.loc[len(tag)] = tambahan
 
-        hasil= conn.query(F"call belum_bayar ('{pilih_ta}', '{kat_unit}','{kat_tag}', '{nama_tag}') ")
-        df = pd.DataFrame(hasil)
-        df.index +=1
-        df.index.rename('No', inplace=True)
-        
-       
+            nama_tag = st.selectbox('nama tagihan',(tag))
+            
+        if nama_tag == 'Semua SPP':
+            result = conn.query(F"call belum_bayar_Semua_tag ('{pilih_ta}', '{kat_unit}','{kat_tag}')")
+            df = pd.DataFrame(result)
+            df.index +=1
+            df.index.rename('No', inplace=True)
+
+        else:
+            hasil= conn.query(F"call belum_bayar ('{pilih_ta}', '{kat_unit}','{kat_tag}', '{nama_tag}') ")
+            df = pd.DataFrame(hasil)
+            df.index +=1
+            df.index.rename('No', inplace=True)
+               
         '''        
         locale.setlocale(locale.LC_ALL, 'id_ID')
         def format_currency(value):
@@ -229,9 +224,7 @@ def tunggakan():
         df.loc['Total'] = pd.Series(df.sum(numeric_only=True) )
         st.write(df)
      
-    with tab4:
-
-          
+    with tab4:          
         nama_ortu = conn.query(f"select distinct `nama orang tua` from v_tunggakan_ortu")
         semua = "semua orang tua"
         
@@ -257,11 +250,6 @@ def tunggakan():
             df6 = df2[['nama siswa','total','terbayarkan','kekurangan']]
             st.write(df6)
             
-
-            
-        
-        
-        
         #download
         df = conn.query("select * from v_kumulatif_ortu")
         
