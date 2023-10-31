@@ -7,6 +7,7 @@ conn = st.experimental_connection('mysql', type='sql' )
 ta= conn.query(F"select thn_ajaran as ta FROM thn_ajaran order by ta desc")
 unit= conn.query(F"select nama_unit  FROM unit_pendidikan ")
 
+
 def data_siswa():
     st.write("# Data Siswa")
 
@@ -41,23 +42,36 @@ def identitas_siswa():
         )
     
     if add_radio == "nama siswa":
-        cari_siswa = st.text_input('input nama',max_chars=40)
+        cari_siswa = st.text_input('ketik nama siswa',max_chars=40)
         nama_siswa = conn.query(F"call cari_siswa(  '{cari_siswa}','{pilih_ta}') ")
         df = pd.DataFrame(nama_siswa)
+        if cari_siswa == '':
+            st.info('silakan input nama_siswa')
+        else:
+            df.index +=1
+            df.index.rename('No', inplace=True)
+            st.dataframe(df)
 
     elif add_radio == "NIS":
-        cari_NIS = st.text_input('input nama',max_chars=10)
+        cari_NIS = st.text_input('ketik NIS',max_chars=10)
         NIS  = conn.query(F"call NIS('{cari_NIS}','{pilih_ta}') ") 
-        df = pd.DataFrame(NIS)
+        if cari_NIS =='':
+            st.info('silakan input NIS')
+        else:
+            df = pd.DataFrame(NIS)
+            hasil = df.T
+            st.table(hasil)
         
     else:
-        cari_ortu = st.text_input('input nama',max_chars=40)
+        cari_ortu = st.text_input('ketik nama ortu',max_chars=40)
         ayah_ibu = conn.query(F"call cari_ortu( '{cari_ortu}','{pilih_ta}')  " )
-        df = ayah_ibu
-
-    df.index +=1
-    df.index.rename('No', inplace=True)
-    st.write(df)
+        if cari_ortu == '':
+            st.info('silakan input nama ortu')
+        else:
+            df = ayah_ibu
+            df.index +=1
+            df.index.rename('No', inplace=True)
+            st.dataframe(df,width=)
 
 def siswa_ta():  
     st.text("tahun ajaran")
@@ -201,3 +215,7 @@ def saudara():
     bersaudara.index +=1
     bersaudara.index.rename('No', inplace=True)
     st.write(bersaudara)
+
+
+
+# komen

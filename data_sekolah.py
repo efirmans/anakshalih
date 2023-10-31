@@ -1,8 +1,15 @@
 import streamlit as st
+st.set_page_config(
+    page_title='Info YPIIAH',
+    layout="wide")
+
+
 from siswa import * 
 from akademik import *
 from jemputan import *
 from dana_pendidikan import *
+
+
 
 conn = st.experimental_connection('mysql', type='sql' )
 
