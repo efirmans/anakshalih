@@ -42,14 +42,18 @@ def histori():
     satu = str(ubah).replace("[['","") 
     st.text('nama siswa: '+ str(satu).replace("']]",""))
 
-
-    if kategori == tambahan:
+    if cari=='':
+        st.info('silahan input NIS')
+    elif kategori == tambahan:
         df =conn.query (F"call nama_by_tagih_non_kategori ('{cari}','{pilih_ta}')")
+        df.index +=1
+        df.index.rename('No', inplace=True)
+        st.dataframe(df)
     else:
         df =conn.query (F"call nama_by_tagih ('{cari}','{pilih_ta}','{kategori}')")
-    df.index +=1
-    df.index.rename('No', inplace=True)
-    st.write(df)
+        df.index +=1
+        df.index.rename('No', inplace=True)
+        st.dataframe(df)
     
 def dompet_pendidikan():
     st.text('dompet pendidikan')
@@ -106,7 +110,7 @@ def tunggakan():
         filter_hasil = hasilnya[['nama siswa', 'total', 'terbayarkan','kekurangan']]
         
         filter_hasil.loc['Total'] = pd.Series(filter_hasil.sum(numeric_only=True) )
-        st.write(filter_hasil)
+        st.dataframe(filter_hasil)
 
         # df.index +=1
         # df.index.rename('No', inplace=True)
@@ -211,16 +215,6 @@ def tunggakan():
             df.index +=1
             df.index.rename('No', inplace=True)
                
-        '''        
-        locale.setlocale(locale.LC_ALL, 'id_ID')
-        def format_currency(value):
-            return locale.format_string('%d', (value,),grouping=True)
-        df['kekurangan'] = df['kekurangan'].map(format_currency)
-        df['terbayar'] = df['terbayar'].map(format_currency)
-        df['total'] = df['total'].map(format_currency)
-        '''
-        
-        
         df.loc['Total'] = pd.Series(df.sum(numeric_only=True) )
         st.write(df)
      

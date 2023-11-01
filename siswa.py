@@ -78,12 +78,14 @@ def siswa_ta():
     cari = st.text_input('input NIS',max_chars=10)
     NIS  = conn.query(F"call nis_ta('{cari}') ") 
     df = pd.DataFrame(NIS)
-    
     df.index +=1
     df.index.rename('No',inplace=True)
-    st.write(df[['tahun ajaran','kelas']])
-    nama = df['Nama siswa'].drop_duplicates()
-    st.text('nama siswa: ' + nama.values)
+    if cari=='':
+        st.info('silahkan input nis')
+    else:
+        st.write(df[['tahun ajaran','kelas']])
+        nama = df['Nama siswa'].drop_duplicates()
+        st.text('nama siswa: ' + nama.values)
 
 def alamat():
     st.text("Alamat")
