@@ -71,7 +71,7 @@ def identitas_siswa():
             df = ayah_ibu
             df.index +=1
             df.index.rename('No', inplace=True)
-            st.dataframe(df,width=)
+            st.dataframe(df)
 
 def siswa_ta():  
     st.text("tahun ajaran")
