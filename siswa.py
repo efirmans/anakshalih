@@ -7,6 +7,8 @@ conn = st.experimental_connection('mysql', type='sql' )
 ta= conn.query(F"select thn_ajaran as ta FROM thn_ajaran order by ta desc")
 unit= conn.query(F"select nama_unit  FROM unit_pendidikan ")
 
+with open('style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 def data_siswa():
     st.write("# Data Siswa")
@@ -34,7 +36,10 @@ def data_umum():
         alamat()
 
 def identitas_siswa():
-    pilih_ta = st.selectbox('tahun ajaran', (ta))
+    
+    col1,col2 = st.columns(2)
+    with col1:
+        pilih_ta = st.selectbox('tahun ajaran', (ta))
 
     add_radio = st.radio(
             "cari siswa berdasarkan ",
@@ -42,7 +47,9 @@ def identitas_siswa():
         )
     
     if add_radio == "nama siswa":
-        cari_siswa = st.text_input('ketik nama siswa',max_chars=40)
+        
+        cari_siswa = st.text_input('ketik nama siswa',max_chars=40,)
+
         nama_siswa = conn.query(F"call cari_siswa(  '{cari_siswa}','{pilih_ta}') ")
         df = pd.DataFrame(nama_siswa)
         if cari_siswa == '':
@@ -178,7 +185,10 @@ def jenjang_siswa():
     )   
 
 def siswa_per_unit():
-    pilih_ta = st.selectbox('pilih tahun ajaran', (ta))
+    col1, col2,col3,col4 = st.columns(4)
+    with col1:
+        pilih_ta = st.selectbox('pilih tahun ajaran', (ta))
+        
     jmlh  = conn.query(F"call jml_siswa('{pilih_ta}') ") 
     df = pd.DataFrame(jmlh)
     df.loc[len(df.index)] = ['TOTAL',df['jumlah siswa'].sum(numeric_only=True)]  
@@ -217,7 +227,3 @@ def saudara():
     bersaudara.index +=1
     bersaudara.index.rename('No', inplace=True)
     st.write(bersaudara)
-
-
-
-# komen
