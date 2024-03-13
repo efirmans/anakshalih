@@ -1,17 +1,12 @@
 import streamlit as st
 st.set_page_config(
-    page_title='Info YPIIAH',
-    layout="wide")
+    page_title='Sekolah Anak Shalih',
+    layout="centered")
 
+conn = st.connection('mysql', type='sql' )
 
-from siswa import * 
-from akademik import *
-from jemputan import *
-from dana_pendidikan import *
-
-
-
-conn = st.experimental_connection('mysql', type='sql' )
+from Identitas_siswa.data_umum_siswa import data_umum
+from Identitas_siswa.statistik import statistik
 
 def intro():
     import streamlit as st
@@ -21,34 +16,31 @@ def intro():
 
     st.markdown(
         """
-        Data Warehouse Project mencakup 
+        ### Data Warehouse Project 
 
-        - Data umum siswa
-        - Data Pembayaran Pendidikan
-        - Data Akademik
-        - Data Jemputan
-        - Data UKS
-        - Data perpustakaan
-          
-        ### Tahap awal
+        Tahap 1
 
-        - Data Umum Siswa , Pembayaran pendidikan , dan  Jemputan (Agustus - September 2023)
-        - Data Akademik (Oktober-November 2023)
-        - Data Perpustakaan, UKS (Oktober- Desember 2023)
-        
+        - Data Identitas Siswa
     """
     )
 
 
 
+def data_siswa():
+    st.write("# Data Siswa")
+
+    sub_kategori ={
+        "data umum siswa":data_umum,
+        "statistik siswa":statistik,
+       
+        }
+    sub_kat = st.sidebar.selectbox ("sub kategori",sub_kategori.keys())
+    sub_kategori[sub_kat]()
+
 page_names_to_funcs = {
     "-":intro,
-    "Data siswa":data_siswa,
-    "Jemputan":jemputan,
-    "Biaya Pendidikan" :biaya_pendidikan,
-    "Akademik": akademik ,
+    "Data siswa":data_siswa
     }
-
 kategori = st.sidebar.selectbox("pilih kategori", page_names_to_funcs.keys())
 page_names_to_funcs[kategori]()
 
