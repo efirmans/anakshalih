@@ -7,7 +7,7 @@ conn = st.connection('mysql', type='sql' )
 
 from Identitas_siswa.data_umum_siswa import data_umum
 from Identitas_siswa.statistik import statistik
-
+@st.cache_data
 def intro():
     import streamlit as st
 

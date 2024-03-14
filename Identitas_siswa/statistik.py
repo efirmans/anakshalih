@@ -100,23 +100,31 @@ def siswaKelas():
     filter_kelas = df2['nama kelas'].isin(pil_kelas)
 
     hasil = df2[filter_unit & filter_ta & filter_kelas]
-    st.dataframe(hasil[['tahun ajaran','nama unit','nis','nama kelas','nama']],hide_index=True)
+    st.dataframe(hasil[['tahun ajaran','nama unit','nis','nama kelas','nama']],hide_index=True,use_container_width=True)
     
 def sebaran():
     df = pd.DataFrame(alamat)
     df2 = pd.DataFrame(alamat_siapa)
-    st.dataframe(df)
+    df.reset_index()
+    df.index +=1
+    df.index.rename('No', inplace=True)
+    
+    st.dataframe(df,use_container_width=True)
 
     
     kelurahan = df2['kelurahan'].unique().tolist()
     pilih_kelurahan = st.selectbox('kelurahan',kelurahan,placeholder='pilih kelurahan...',)
     cari_kelurahan = df2.query(F"kelurahan == '{pilih_kelurahan}' ")
+    
+    
     cari_kelurahan.reset_index(inplace=True,drop=True)
     cari_kelurahan.index +=1
-    # cari_kelurahan.rename('No', inplace=True)
-    st.dataframe(cari_kelurahan)
+    # cari_kelurahan.rename('No', inplace=False)
+    
+    st.dataframe(cari_kelurahan,use_container_width=True)
     
 
 def jumlah_anak():
     df = pd.DataFrame(bersaudara)
+    df.index +=1
     st.dataframe(df)
