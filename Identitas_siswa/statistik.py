@@ -127,4 +127,5 @@ def sebaran():
 def jumlah_anak():
     df = pd.DataFrame(bersaudara)
     df.index +=1
+    df.index.rename('no',inplace=True)
     st.dataframe(df)

@@ -104,6 +104,6 @@ def detail():
     detail_nis = st.text_input('input NIS')
     df2 = df[df['nis'].str.contains(detail_nis,regex=False,case=False)]
     if detail_nis == '':
-        st.text('input nis')    
+        pass  
     else:   
         st.table(df2.T)
