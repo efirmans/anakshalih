@@ -6,4 +6,4 @@ pandas==2.2.1
 SQLAlchemy==2.0.20
 streamlit==1.32.2
 toml==0.10.2
-mysqlclient==2.2.4
+mysql-connector-python==8.1.0
