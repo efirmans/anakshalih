@@ -23,7 +23,6 @@ def histori():
     df = pd.DataFrame(historisBayar)
     thn_ajaran = df['tahun ajaran'].unique().tolist()
     kategori_tagihan = df['kategori'].unique().tolist()
-    mas
     col1,col2= st.columns(2)
     with col1:
         pilih_ta = st.selectbox('pilih tahun ajaran', thn_ajaran)
