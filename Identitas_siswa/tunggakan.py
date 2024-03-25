@@ -4,6 +4,12 @@ import pandas as pd
 conn = st.connection('mysql', type='sql' )
 tagihan= conn.query("select * from v_tunggakan_by_nama_tagihan")
 df= pd.DataFrame(tagihan)
+catatan = conn.query ("SELECT * from tagihan_per_siswa")
+df2 = pd.DataFrame(catatan)
+df2['tgl bayar'] = pd.to_datetime(df2['tgl bayar'],format="mixed" )
+max_date = df2['tgl bayar'].max()
+
+st.write('data update',max_date)
 
 def nunggak():
     nama_tab = ["Agregat tunggakan","jenis tagihan", "nama siswa","unit","nama orang tua"]
@@ -11,8 +17,11 @@ def nunggak():
 
     with tab1:
         st.text('Agregat tunggakan')
-        total_tunggakan = df.groupby('kategori')['kekurangan'].sum().reset_index()
-        total_tunggakan.loc[len(total_tunggakan)] = ['TOTAL', total_tunggakan['kekurangan'].sum()]
+        df2 = df.rename(columns={"kekurangan":"nominal"})
+        total_tunggakan = df2.groupby('kategori')['nominal'].sum().reset_index()
+        
+        
+        total_tunggakan.loc[len(total_tunggakan)] = ['TOTAL', total_tunggakan['nominal'].sum()]
 
         st.dataframe(total_tunggakan,hide_index=True)
 
