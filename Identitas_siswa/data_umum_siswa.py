@@ -36,39 +36,41 @@ def data_umum():
 
 # Pencarian Siswa
 def pencarian():
-    
-    
+    # Initialize session state for search input if not already set
+    if 'search_input' not in st.session_state:
+        st.session_state.search_input = ''
+
     add_radio = st.radio(
-                "cari siswa berdasarkan ",
-                ("nama siswa", "NIS", "nama orang tua"),horizontal=True
-            )
+        "cari siswa berdasarkan ",
+        ("nama siswa", "NIS", "nama orang tua"), horizontal=True
+    )
     df = pd.DataFrame(siswaData)
     
+    # Use session state to store and retrieve the current search input
+    st.session_state.search_input = st.text_input('input ' + add_radio, max_chars=40, value=st.session_state.search_input)
     
-    if add_radio == "nama siswa":
-        cari_siswa = st.text_input('input nama',max_chars=40,key='cari_siswa')
-        nama_siswa = df[df['Nama siswa'].str.contains(cari_siswa,regex=False,case=False)] 
-    
-
-    elif add_radio == "NIS":
-        cari_nis = st.text_input('input NIS',max_chars=10,key='cari_nis')
-        nama_siswa = df[df['NIS'].str.contains(cari_nis,regex=False,case=False)]
-        
-            
+    if st.session_state.search_input == '':
+        pass
     else:
-        cari_ortu = st.text_input('input nama orang tua',max_chars=40,key='cari_ortu')
-        nama_siswa = df[df['Nama Ayah'].str.contains(cari_ortu,regex=False,case=False) | df['Nama Ibu'].str.contains(cari_ortu,regex=False,case=False)] 
+        if add_radio == "nama siswa":
+            nama_siswa = df[df['Nama siswa'].str.contains(st.session_state.search_input, regex=False, case=False)]
+        
+        elif add_radio == "NIS":
+            nama_siswa = df[df['NIS'].str.contains(st.session_state.search_input, regex=False, case=False)]
+            
+        else:
+            nama_siswa = df[df['Nama Ayah'].str.contains(st.session_state.search_input, regex=False, case=False) | 
+                            df['Nama Ibu'].str.contains(st.session_state.search_input, regex=False, case=False)]
 
-    nama_siswa.reset_index(inplace=True,drop=True)
-    nama_siswa.index +=1
-    nama_siswa.index.rename('No', inplace=True)
-
+        nama_siswa.reset_index(inplace=True, drop=True)
+        nama_siswa.index += 1
+        nama_siswa.index.rename('No', inplace=True)
     
-    st.dataframe(nama_siswa,use_container_width=True)
+        st.dataframe(nama_siswa, use_container_width=True)
 
 # mencari historis kelas
 def historis():
-    cari_historis = st.text_input(' ',max_chars=10)
+    cari_historis = st.text_input(' ',max_chars=10,placeholder='input nis')
     df = pd.DataFrame(historisKelas)
     df2 = df.query(F" nis == '{cari_historis}' ")
     df3= df[df['nis'] == cari_historis]['Nama siswa'].drop_duplicates().to_string(index=False)
@@ -92,12 +94,16 @@ def siswa_pindah():
     st.write(pindahData)
 
 def alumni():
-    st.session_state.update
+    
     ad =pd.DataFrame(alumniData)
     daftarThnLulus = ad['tahun lulus'].unique().tolist()
-    pilihTahunLulus = st.multiselect('tahun lulus',daftarThnLulus)
+    pilihTahunLulus = st.multiselect('tahun lulus',daftarThnLulus,placeholder='pilih tahun lulus')
     mat = ad["tahun lulus"].isin(pilihTahunLulus)    
-    st.dataframe(ad[mat],use_container_width=True,hide_index=True)
+    if pilihTahunLulus == []:
+        st.session_state
+        pass
+    else:
+        st.dataframe(ad[mat],use_container_width=True,hide_index=True)
 
 def detail():
     df = pd.DataFrame(detailSiswa)
@@ -106,4 +112,5 @@ def detail():
     if detail_nis == '':
         pass  
     else:   
-        st.table(df2.T)
+        df2_display = df2.reset_index(drop=True).T
+        st.table(df2_display)

@@ -7,7 +7,9 @@ conn = st.connection('mysql', type='sql' )
 
 from Identitas_siswa.data_umum_siswa import data_umum
 from Identitas_siswa.statistik import statistik
-@st.cache_data
+from Identitas_siswa.pembayaran import pembayaran
+
+@st.cache_resource
 def intro():
     import streamlit as st
 
@@ -17,21 +19,23 @@ def intro():
     st.markdown(
         """
         ### Data Warehouse Project 
-
-        Tahap 1
+          
+        Tahap 1 (1.0)
 
         - Data Identitas Siswa
+        - Pembayaran
     """
     )
 
 
 
 def data_siswa():
-    st.write("# Data Siswa")
+    st.write("# Data Umum Siswa")
 
     sub_kategori ={
         "data umum siswa":data_umum,
         "statistik siswa":statistik,
+        
        
         }
     sub_kat = st.sidebar.selectbox ("sub kategori",sub_kategori.keys())
@@ -39,7 +43,8 @@ def data_siswa():
 
 page_names_to_funcs = {
     "-":intro,
-    "Data siswa":data_siswa
+    "Data siswa":data_siswa,
+    "Pembayaran":pembayaran
     }
 kategori = st.sidebar.selectbox("pilih kategori", page_names_to_funcs.keys())
 page_names_to_funcs[kategori]()
