@@ -3,7 +3,7 @@ import pandas as pd
 import altair as alt
 
 from .tunggakan import nunggak
-
+from .upload_data import update
 conn = st.connection('mysql', type='sql' )
 historisBayar = conn.query ("SELECT * from tagihan_per_siswa")
 
@@ -12,7 +12,8 @@ def pembayaran():
     sub_kategori ={
         
         "histori pembayaran":histori,
-        "tunggakan":nunggak
+        "tunggakan":nunggak,
+        "update":update
              }
     sub_kat = st.sidebar.selectbox('sub kategori', sub_kategori.keys())
     sub_kategori[sub_kat]()
@@ -43,6 +44,7 @@ def histori():
         st.write(f'Nama : {nama}  \n NIS: {nis}')
        
         st.dataframe(df2[['tagihan','total','terbayarkan','kekurangan', 'tgl bayar']],hide_index=True,use_container_width=True)
+
 
 
 

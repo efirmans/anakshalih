@@ -4,14 +4,14 @@ import pandas as pd
 conn = st.connection('mysql', type='sql' )
 tagihan= conn.query("select * from v_tunggakan_by_nama_tagihan")
 df= pd.DataFrame(tagihan)
-catatan = conn.query ("SELECT * from tagihan_per_siswa")
-df2 = pd.DataFrame(catatan)
-df2['tgl bayar'] = pd.to_datetime(df2['tgl bayar'],format="mixed" )
-max_date = df2['tgl bayar'].max()
+catatan = conn.query ("SELECT * from dana_pendidikan")
 
-st.write('data update',max_date)
 
 def nunggak():
+    df2 = pd.DataFrame(catatan)
+    df2['tgl_bayar'] = pd.to_datetime(df2['tgl_bayar'],format="mixed" )
+    max_date = df2['tgl_bayar'].max()
+    st.write('data update',max_date)
     nama_tab = ["Agregat tunggakan","jenis tagihan", "nama siswa","unit","nama orang tua"]
     tab1, tab2, tab3, tab4, tab5 = st.tabs(nama_tab)
 
