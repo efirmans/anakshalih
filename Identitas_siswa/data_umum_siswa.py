@@ -4,7 +4,7 @@ import extra_streamlit_components as stx
 
 conn = st.connection('mysql', type='sql' )
 siswaData = conn.query("select * from cari_siswa")
-historisKelas = conn.query("select * from historis_kelas")
+historisKelas = conn.query("select * from rekam_kelas")
 alumniData = conn.query("SELECT * FROM alumni")
 detailSiswa = conn.query("select * from detail_siswa")
 
@@ -36,14 +36,21 @@ def data_umum():
             df = pd.DataFrame(alumniData)
             st.session_state
             cari  = st.text_input('Berdasarkan nama , NIS, nama orang tua',placeholder='silahkan input nama / nis / nama orang tua',key='carialumni' )
-            if cari :
-                nama_siswa = df[df['nama lengkap'].str.contains(cari, regex=False, case=False) | df['nis'].str.contains(cari, regex=False, case=False) 
-                | df['nama ayah'].str.contains(cari, regex=False, case=False) | df['nama ibu'].str.contains(cari, regex=False, case=False)]
-
+            nama_siswa = df[df['nama lengkap'].str.contains(cari, regex=False, case=False) |
+                             df['nis'].str.contains(cari, regex=False, case=False) | 
+                            #  df['nis 2'].str.contains(cari, regex=False, case=False) |
+                             df['nama ayah'].str.contains(cari, regex=False, case=False)|
+                             df['nama ibu'].str.contains(cari, regex=False, case=False)]
+            
+            if not cari :
+                pass
+            elif not nama_siswa.empty:
                 nama_siswa.reset_index(inplace=True, drop=True)
                 nama_siswa.index += 1
                 nama_siswa.index.rename('No', inplace=True)
-                st.dataframe(nama_siswa, use_container_width=True)          
+                st.dataframe(nama_siswa, use_container_width=True)
+            else:
+                st.error('nama,nis, nama orangtua tidak terdaftar')
 
         elif tab == "tahun":
             alumni()
@@ -57,64 +64,40 @@ def data_umum():
 
 # Pencarian Siswa
 def pencarian():
-    # # Initialize session state for search input if not already set
-    # if 'search_input' not in st.session_state:
-    #     st.session_state.search_input = ''
-
-    # add_radio = st.radio(
-    #     "cari siswa berdasarkan ",
-    #     ("nama siswa", "NIS", "nama orang tua"), horizontal=True
-    # )
-    # df = pd.DataFrame(siswaData)
-    
-    # # Use session state to store and retrieve the current search input
-    # st.session_state.search_input = st.text_input('input ' + add_radio, max_chars=40, value=st.session_state.search_input)
-    
-    # if st.session_state.search_input == '':
-    #     pass
-    # else:
-    #     if add_radio == "nama siswa":
-    #         nama_siswa = df[df['Nama siswa'].str.contains(st.session_state.search_input, regex=False, case=False)]
-        
-    #     elif add_radio == "NIS":
-    #         nama_siswa = df[df['NIS'].str.contains(st.session_state.search_input, regex=False, case=False)]
-            
-    #     else:
-    #         nama_siswa = df[df['Nama Ayah'].str.contains(st.session_state.search_input, regex=False, case=False) | 
-    #                         df['Nama Ibu'].str.contains(st.session_state.search_input, regex=False, case=False)]
-
-    #     nama_siswa.reset_index(inplace=True, drop=True)
-    #     nama_siswa.index += 1
-    #     nama_siswa.index.rename('No', inplace=True)
-    
-    #     st.dataframe(nama_siswa, use_container_width=True)
-
-
-#baru
     df = pd.DataFrame(siswaData)
-    st.session_state
     cari  = st.text_input('Berdasarkan nama siswa, NIS, nama orang tua',placeholder='silahkan input nama siswa / nis / nama orang tua' )
-    if cari :
-        nama_siswa = df[df['Nama siswa'].str.contains(cari, regex=False, case=False) | df['NIS'].str.contains(cari, regex=False, case=False) 
-        | df['Nama Ayah'].str.contains(cari, regex=False, case=False) | df['Nama Ibu'].str.contains(cari, regex=False, case=False)]
-
+    
+    nama_siswa = df[df['Nama siswa'].str.contains(cari, regex=False, case=False) | 
+                    df['nis'].str.contains(cari, regex=False, case=False) | 
+                    df['nis 2'].str.contains(cari, regex=False, case=False) | 
+                    df['Nama Ayah'].str.contains(cari, regex=False, case=False) | 
+                    df['Nama Ibu'].str.contains(cari, regex=False, case=False)]
+    
+    if not cari:
+        pass
+    elif not nama_siswa.empty: 
         nama_siswa.reset_index(inplace=True, drop=True)
         nama_siswa.index += 1
         nama_siswa.index.rename('No', inplace=True)
         st.dataframe(nama_siswa, use_container_width=True)
-
-
+    else:
+        st.error ("nama niswa, NIS, nama orangtua tidak ketemu")
+        
+    
 
 # mencari historis kelas
 def historis():
     cari_historis = st.text_input(' ',max_chars=10,placeholder='input nis')
     df = pd.DataFrame(historisKelas)
-    df2 = df.query(F" nis == '{cari_historis}' ")
-    df3= df[df['nis'] == cari_historis]['Nama siswa'].drop_duplicates().to_string(index=False)
+    df2 = df.query(" `nis`  ==  @cari_historis | `nis 2`  ==  @cari_historis")
+  
     if cari_historis =='':
         pass
-    else:
-        st.text('nama siswa: ' + df3 +  '\nNIS: ' + cari_historis)
+    elif cari_historis not in df['nis'].values  and cari_historis not in df['nis 2'].values:
+        st.error ("NIS tidak terdaftar")
+    else: 
+        df3= df[(df['nis'] == cari_historis ) | (df['nis 2'] == cari_historis)] ['Nama siswa'].drop_duplicates().to_string(index=False)
+        st.text('nama siswa: ' + df3 +  '\nnis: ' + cari_historis)
     
         df2.reset_index(inplace=True,drop=True)
         df2.index +=1
@@ -146,9 +129,11 @@ def alumni():
 def detail():
     df = pd.DataFrame(detailSiswa)
     detail_nis = st.text_input('input NIS')
-    df2 = df[df['nis'].str.contains(detail_nis,regex=False,case=False)]
-    if detail_nis == '':
+    df2 = df[(df['nis']== detail_nis) | (df['nis 2'] == detail_nis)]
+    if not detail_nis :
         pass  
-    else:   
+    elif not df2.empty:
         df2_display = df2.reset_index(drop=True).T
         st.table(df2_display)
+    else:
+        st.error('nis tidak terdaftar')

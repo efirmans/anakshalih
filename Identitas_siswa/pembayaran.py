@@ -34,7 +34,7 @@ def histori():
             
     cari_nis = st.text_input('input nis',max_chars=10)
     df2 = df[(df['kategori'] == kategori) & (df['tahun ajaran'] == pilih_ta) 
-             & (df['nis'] == cari_nis)]
+             & ((df['nis'] == cari_nis) | (df['nis 2'] == cari_nis)) ]
 
     if cari_nis =='':
         pass

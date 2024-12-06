@@ -46,16 +46,17 @@ def nunggak():
         cari_nis = st.text_input('input nis')
     
         if cari_nis:
-            df2 = df.query("nis == @cari_nis ")
+            df2 = df.query("nis == @cari_nis or `nis 2` == @cari_nis  ")
             
             df2.reset_index(drop=True, inplace=True)
             df2.index +=1
             df2.loc['Total'] = pd.Series(df2.sum(numeric_only=True).fillna(0) )
             df2.index.rename('No',inplace=True)
-            df4= df[df['nis'] == cari_nis]['nama siswa'].drop_duplicates().to_string(index=False)
+            df4= df[(df['nis'] == cari_nis) |  (df['nis 2'] == cari_nis)  ]['nama siswa'].drop_duplicates().to_string(index=False)
             st.text('nama siswa: ' + df4 +  '\nNIS: ' + cari_nis)
             df3 = df2[['kategori','total','terbayarkan','kekurangan']]
             st.dataframe(df3)
+            
 
     with tab4:
         st.header("berdasar unit")

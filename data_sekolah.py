@@ -43,8 +43,7 @@ def data_siswa():
 
 page_names_to_funcs = {
     "-":intro,
-    "Data siswa":data_siswa,
-    "Pembayaran":pembayaran
+    "Data siswa":data_siswa
     }
 kategori = st.sidebar.selectbox("pilih kategori", page_names_to_funcs.keys())
 page_names_to_funcs[kategori]()
