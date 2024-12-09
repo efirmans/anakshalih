@@ -148,11 +148,28 @@ def siswaKelas():
 def sebaran():
     df = pd.DataFrame(alamat)
     df2 = pd.DataFrame(alamat_siapa)
-    df.reset_index()
-    df.index +=1
-    df.index.rename('No', inplace=True)
+
     
-    st.dataframe(df,use_container_width=True)
+    Lokasi = st.radio(
+    "kabupaten/kota",
+    ["Kota Bogor", "Kab. Bogor"],key="KabKot",)  
+    
+    
+    df.reset_index(drop=True,inplace=True)
+    df.index +=1
+    df.index.name = 'No'
+    
+    cari_lokasi = df.query("kab_kota == @Lokasi") [['kecamatan','kelurahan','Jumlah']]
+    st.dataframe(cari_lokasi,use_container_width=True)
+    
+ 
+
+  
+
+
+
+
+    
 
     
     kelurahan = df2['kelurahan'].unique().tolist()

@@ -12,7 +12,7 @@ def data_umum():
     st.text("Data umum siswa")
 
 
-    tab1,tab2,tab3,tab4, tab5= st.tabs(['pencarian','historis', 'siswa pindah', 'alumni', 'info detail siswa'],)
+    tab1,tab2,tab3,tab4, tab5, tab6= st.tabs(['pencarian','historis', 'siswa pindah', 'alumni', 'info detail siswa','hubungan keluarga'],)
       
     with tab1:
         st.header('Pencarian  siswa')
@@ -61,6 +61,10 @@ def data_umum():
     with tab5:
         st.header('Info detail siswa')    
         detail()
+
+    with tab6:
+        st.header('hubungan keluarga')
+        keluarga()
 
 # Pencarian Siswa
 def pencarian():
@@ -137,3 +141,23 @@ def detail():
         st.table(df2_display)
     else:
         st.error('nis tidak terdaftar')
+
+def keluarga():
+    cari_NIS = st.text_input('input NIS',max_chars=10)
+    NIS  = conn.query(F"call keluarga('{cari_NIS}') ") 
+    df = pd.DataFrame(NIS)
+    if not cari_NIS :
+        pass  
+    elif not df.empty:
+        df_Ayah = df[df['Nis'] == cari_NIS] ['Nama Ayah'].to_string(index=False)
+        df_Ibu = df[df['Nis'] == cari_NIS] ['Nama Ibu'].to_string(index=False)
+        st.text('Nama Ayah: ' + df_Ayah  + '\nNama Ibu: ' + df_Ibu)
+        df.reset_index(inplace=True,drop=True)
+        df.index +=1
+        df.index.rename('No', inplace=True)
+        st.table(df[['Nis','Nama siswa','Sekolah','kelas']])
+    else:
+        st.error('nis tidak terdaftar')
+
+
+
