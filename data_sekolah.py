@@ -9,7 +9,7 @@ from Identitas_siswa.data_umum_siswa import data_umum
 from Identitas_siswa.statistik import statistik
 from Identitas_siswa.pembayaran import pembayaran
 
-@st.cache_resource
+
 def intro():
     import streamlit as st
 
